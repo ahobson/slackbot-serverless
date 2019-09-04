@@ -1,0 +1,31 @@
+# For full config options, check the docs:
+#    docs.serverless.com
+
+service: slackbot-serverless
+#app: your-app-name
+
+frameworkVersion: "=1.51.0"
+
+provider:
+  name: aws
+  runtime: python3.7
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+functions:
+  slackbot:
+    handler: src/slackbot/handler.endpoint
+    events:
+      - http:
+          path: events
+          method: get
