@@ -24,7 +24,7 @@ custom:
 
 functions:
   slackbot:
-    handler: src/slackbot/handler.endpoint
+    handler: src/slackbot/events/handler.endpoint
     events:
       - http:
           path: events
