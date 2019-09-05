@@ -1,17 +1,12 @@
 import json
-import os
-import sys
 
-sys.path.insert(0, os.path.abspath("./src"))
-
-from common.common import common_thing
+from slackbot.common.common import common_thing
 
 def endpoint(event, context):
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
         "common": common_thing(),
-        "input": sys.path,
-        "dot": os.path.abspath(".")
+        "input": event
     }
 
     response = {

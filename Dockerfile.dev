@@ -10,6 +10,6 @@ RUN npm install -g serverless@1.51.0
 RUN pip install pipenv
 
 COPY Pipfile Pipfile.lock ./
-RUN pipenv install --deploy --system
+RUN pipenv install --deploy --system --dev
 
 ENTRYPOINT ["serverless"]
