@@ -1,26 +1,52 @@
 import json
+import logging
+import os
 
-from slackbot.common.common import common_thing
+import requests
 
-def endpoint(event, context):
-    body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "common": common_thing(),
-        "input": event
-    }
+import slackbot.events.slack as slack
 
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
+SIGNING_SECRET = os.getenv('SIGNING_SECRET')
+WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 
-    return response
+def endpoint(event, _):
+    """Slack endpoint"""
 
-    # Use this code if you don't use the http event with the LAMBDA-PROXY
-    # integration
-    """
+    logger = logging.getLogger('handler')
+    logger.setLevel(logging.INFO)
+    verification_error_message = slack.verify_event(event, SIGNING_SECRET)
+    if verification_error_message:
+        logger.warning('Unverified message: %s', verification_error_message)
+        return {
+            "statusCode": 403,
+            "body": json.dumps({"errorMessage": verification_error_message}),
+            "headers": {"Content-type": "application/json"}
+        }
+
+    # Parse the request payload into JSON
+    event_data = json.loads(event['body'])
+
+    # Echo the URL verification challenge code back to Slack
+    if "challenge" in event_data:
+        logger.info('Responding to challenge')
+        crdata = {"challenge": event_data.get("challenge")}
+        return {
+            "statusCode": 200,
+            "body": json.dumps(crdata),
+            "headers": {"Content-type": "application/json"}
+        }
+
+    msg = event_data["event"]["text"]
+
+    logger.info('Posting to webhook')
+    requests.post(
+        WEBHOOK_URL,
+        headers={'Content-type': 'application/json'},
+        data=json.dumps({"text": "You said: '{}'".format(msg)})
+    )
+
     return {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "event": event
+        "statusCode": 200,
+        "body": json.dumps({}),
+        "headers": {"Content-type": "application/json"}
     }
-    """

@@ -6,10 +6,10 @@ RUN set -x \
         nodejs npm \
   && apt-get clean -y
 
-RUN npm install -g serverless@1.51.0
+#RUN npm install -g serverless@1.51.0
 RUN pip install pipenv
 
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --deploy --system --dev
 
-ENTRYPOINT ["serverless"]
+ENTRYPOINT ["npx", "sls"]

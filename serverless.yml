@@ -14,10 +14,6 @@ provider:
 #  stage: dev
 #  region: us-east-1
 
-plugins:
-  - serverless-python-requirements
-  - serverless-offline
-
 custom:
   pythonRequirements:
     dockerizePip: non-linux
@@ -25,7 +21,15 @@ custom:
 functions:
   slackbot:
     handler: slackbot/events/handler.endpoint
+    environment:
+      WEBHOOK_URL: ${env:WEBHOOK_URL}
+      SIGNING_SECRET: ${env:SIGNING_SECRET}
     events:
       - http:
           path: events
-          method: get
+          method: post
+
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline
