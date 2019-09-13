@@ -29,6 +29,13 @@ functions:
           path: events
           method: post
 
+package:
+  # python doesn't need node_modules
+  exclude:
+    - .pre-commit*/**
+    - node_modules/**
+    - .pytest_cache/**
+    - tests/**
 
 plugins:
   - serverless-python-requirements
