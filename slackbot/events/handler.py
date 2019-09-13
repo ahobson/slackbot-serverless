@@ -1,6 +1,8 @@
 import json
 import logging
+import logging.config
 import os
+import sys
 
 import requests
 
@@ -9,11 +11,22 @@ import slackbot.events.slack as slack
 SIGNING_SECRET = os.getenv('SIGNING_SECRET')
 WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 
+def is_offline():
+    # This ENV is only set in production by AWS
+    return not os.getenv('AWS_XRAY_DAEMON_ADDRESS')
+
+
+if is_offline():
+    # When running offline, logs need to go to a file as stdin/stdout
+    # is used for the lambda output
+    logging.config.fileConfig("logging_offline.ini")
+
+
 def endpoint(event, _):
     """Slack endpoint"""
 
-    logger = logging.getLogger('handler')
-    logger.setLevel(logging.INFO)
+    logger = logging.getLogger("handler")
+
     verification_error_message = slack.verify_event(event, SIGNING_SECRET)
     if verification_error_message:
         logger.warning('Unverified message: %s', verification_error_message)
